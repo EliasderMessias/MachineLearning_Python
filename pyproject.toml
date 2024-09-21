@@ -1,1 +1,11 @@
+#this would be for packaging if i want to reuse this project or publish it
 
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "ML_Training"
+description = "This Project is for training python and learning ML"
+authors = [{name = "Elias"}]
+readme = "README.md"
