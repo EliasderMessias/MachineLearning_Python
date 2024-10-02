@@ -1,12 +1,15 @@
 import numpy as np
 from collections import Counter
+from statistics import mode
 
 def euclid_dist(x,y):
     return np.sqrt(np.sum((x-y)**2))
 
-class KNN:   #class that mirrors functionality of scikitlearns ML methods for k-Nearest-Neighbours
+    
+
+class _KNN:   #class that mirrors functionality of scikitlearns ML methods for k-Nearest-Neighbours
     def __init__(self, k = 3):
-        if k !=3 and k > 0:
+        if k > 0:
             self.k = k
         elif k <= 0:
             raise ValueError("Neighbourparameter cannot be <= 0")
@@ -16,7 +19,10 @@ class KNN:   #class that mirrors functionality of scikitlearns ML methods for k-
     def fit(self, X, y):
         self.X_train = X
         self.y_train = y
-    
+
+
+class KNNClassifier(_KNN):
+
     def predict(self, X):
         prediction = [self._predict(x) for x in X]
         return np.array(prediction)
@@ -27,18 +33,13 @@ class KNN:   #class that mirrors functionality of scikitlearns ML methods for k-
 
         #sort for shortest distance and take array of the k-first
         indices = np.argsort(distances)[:self.k]
-
+        
         #give the labels for classification from the indices of the previous step
         labels = [self.y_train[i] for i in indices]
 
         #make a decision by majority of occuring labels
-        predicted_label = Counter(labels).most_common(1)
-
+        predicted_label = mode(labels)
         return predicted_label
-
-
-
-
 
         
         
