@@ -1,11 +1,8 @@
 import numpy as np
-from collections import Counter
 from statistics import mode
 
 def euclid_dist(x,y):
     return np.sqrt(np.sum((x-y)**2))
-
-    
 
 class _KNN:   #class that mirrors functionality of scikitlearns ML methods for k-Nearest-Neighbours
     def __init__(self, k = 3):
@@ -22,7 +19,6 @@ class _KNN:   #class that mirrors functionality of scikitlearns ML methods for k
 
 
 class KNNClassifier(_KNN):
-
     def predict(self, X):
         prediction = [self._predict(x) for x in X]
         return np.array(prediction)
@@ -42,7 +38,25 @@ class KNNClassifier(_KNN):
         return predicted_label
 
         
-        
+class KNNRegressor(_KNN):
+    def predict(self,X):
+        prediction = [self._predict(x) for x in X]
+        return np.array(prediction)
+    
+    def _predict(self, x):
+        #calculate distance to all points in X_train
+        distances = [euclid_dist(x,x_train) for x_train in self.X_train]   
+
+        #sort for shortest distance and take array of the k-first
+        indices = np.argsort(distances)[:self.k]
+
+        #give the coordinates for Regression from the indices of the previous step
+        coords = [self.y_train[i] for i in indices]
+
+        #calculate the mean of the k closest pointcoordinates
+        predicted_location = np.mean(coords)
+        return predicted_location
+    
 
 
    
