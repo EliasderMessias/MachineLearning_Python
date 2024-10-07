@@ -4,33 +4,42 @@ path_root = Path(__file__).parents[1]
 sys.path.append(str(path_root))
 
 import unittest
-import numpy as np
 from src.linear import LinRegression
+from sklearn import datasets
+from sklearn.model_selection import train_test_split
 
 class TestLinear(unittest.TestCase):
-    def test_internalParam(self):
+    def test_Initialize(self):
         self.assertEqual(LinRegression().lrate, 0.001)
         self.assertEqual(LinRegression(lrate = 0.01).lrate, 0.01)
         self.assertEqual(LinRegression().n_iters, 1000)
         self.assertEqual(LinRegression(n_iters = 2000).n_iters, 2000)
     
     def test_LinRegression(self):
-        for j in range(1000)
-            X_train[j] = [j + 1, j + 2]   #Fix to make array bigger
-        y_train = np.array([2, 3, 4, 5, 6])
-        X_test = np.array([[2.5, 3.5], [4.5, 5.5]])
+        #create sample and split it
+        X, y = datasets.make_regression(n_samples = 100, n_features = 3, random_state = 3)
+        X_train, X_test, y_train, y_test = train_test_split(X, y, random_state = 0)
 
-        lin = LinRegression(lrate = 0.001)
+        #setup model
+        lin = LinRegression(lrate = 0.01)
         lin.fit(X_train,y_train)
-        
-        real_weights = [1, 1]
-        real_bias = [-1, 0]
-        real_predict = [3.5, 5.5]
+        y_pred = lin.predict(X_test)
 
+        #precalculated weights and bias from sklearn LinearRegression
+        real_w = [29.1931186, 75.5529479, 29.20319866]
+        real_b = 0
+
+        #test weights and bias vs sklearns method parameters
         for i in range(len(lin.weights)):
-            self.assertAlmostEqual(lin.predict(X_test)[i], real_predict[i], delta = 0.02)
-            self.assertAlmostEqual(lin.weights[i], real_weights[i], delta = 0.02) 
-            self.assertAlmostEqual(lin.bias[i], real_bias[i], delta = 0.02) 
+            self.assertAlmostEqual(lin.weights[i], real_w[i], delta = 0.01)
+        self.assertAlmostEqual(lin.bias, real_b, delta = 0.01)
+
+        #precalculated predictions for specific sample
+        real_pred = [-133.41330752, -144.58097038, 158.63138463, 54.63284421, 67.02457604, -9.19545614, 93.41791274, 90.52886868, -144.5134964, 62.20363551, 60.93164245, -184.51696485, -42.47252346, -14.03849722, 149.02638913, 91.45080688, 100.12714128, -224.52846856, -150.39202857, 193.13524936, 156.654647, -61.51985597, 3.09583699, -106.35366146, -89.30487289]
+        #test the predictions
+        for i in range(len(y_test)):
+           self.assertAlmostEqual(y_pred[i], real_pred[i], delta = 0.01)
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
