@@ -12,14 +12,17 @@ from sklearn.model_selection import train_test_split
 import matplotlib.pyplot as plt
 
 #generate simple dataset for regression ( 1 feature only )
-X, y = datasets.make_regression(n_samples = 100, n_features = 2, noise = 20, random_state = 4)
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2)
-
+X, y = datasets.make_regression(n_samples = 100, n_features = 1, noise = 20, random_state = 1)
+print(X, "X")
+y = np.add(y,1000)
+X = np.add(X,500)
+X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=0)
 
 #LinearRegression
-reg = LinRegression(lrate = 0.01, n_iters = 1000)
+reg = LinRegression()
 reg.fit(X_train, y_train)
 pred_lin = reg.predict(X)
+print(reg.coef,reg.intercept)
 
 #KNN-Regression
 knn = KNNRegressor(3)
