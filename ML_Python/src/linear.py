@@ -1,26 +1,39 @@
 import numpy as np
+import scipy.linalg as sp
+
+#QR decomposition using modified Gram-Schmidt, for less numerical instability than classical GS
+def QRFactorization(X):
+    m,n = X.shape
+    R = np.empty([n,n])
+    Q = np.empty([m,n])
+    
+    for i in range(n):
+        v = X[:,i]
+        for j in range(i):
+            R[i,j] = np.dot(Q[:,j].T,v)
+            v = v - (R[i,j]*Q[:,j])
+        R[i,i] = np.linalg.norm(v)
+        Q[:,i] = v/R[i,i]
+    return Q,R.T
 
 class LinRegression:
-    def __init__(self, lrate = 0.001, n_iters = 1000):
-        self.lrate = lrate
-        self.n_iters = n_iters
-        self.weights = None
-        self.bias = None
+    def __init__(self):
+        self.coef = None
+        self.intercept = None
 
     def fit(self, X, y):
         #initializing parameters
-        n_samples, n_features = X.shape
-        self.weights = np.zeros(n_features)
-        self.bias = 0
-
-        #simple gradient descent algo for minimizing the function y - y_pred
-        for _ in range(self.n_iters):
-            y_pred = np.dot(X, self.weights) + self.bias
-
-            self.weights = self.weights - self.lrate * 2/n_samples * np.dot((y_pred - y).T, X)
-            self.bias = self.bias - self.lrate * 2/n_samples * np.sum(y_pred - y)
+        self.coef = np.zeros(X.shape[1])
+        #Calculate weights and bias through QR-factorization
+        Q,R = QRFactorization(X)
+        #weights based on the closed form solution for OLS
+        print(Q,"Q Matrix \n",R ,"R Matrix")
+        self.coef = sp.solve_triangular(R,np.dot(Q.T,y))
+        self.intercept = y.mean() - np.dot(self.coef,X.mean(0))
 
     def predict(self, X):
-        return np.dot(X, self.weights) + self.bias
+        return np.dot(X, self.coef) + self.intercept
 
-
+class Ridge:
+    def __init__(self):
+        pass
