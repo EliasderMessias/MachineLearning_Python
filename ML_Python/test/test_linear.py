@@ -28,7 +28,7 @@ class TestLinear(unittest.TestCase):
         real_b = 0
 
         #test weights and bias vs sklearns method parameters
-        for i in range(len(lin.intercept)):
+        for i in range(lin.coef.shape[0]):
             self.assertAlmostEqual(lin.coef[i], real_w[i], delta = 0.01)
         self.assertAlmostEqual(lin.intercept, real_b, delta = 0.01)
 

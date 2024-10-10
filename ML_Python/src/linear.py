@@ -22,14 +22,15 @@ class LinRegression:
         self.intercept = None
 
     def fit(self, X, y):
-        #initializing parameters
-        self.coef = np.zeros(X.shape[1])
+        #We first add a row of 1s to X so we can get the intercept with the y-axis.
+        Xextended = np.append(np.ones([X.shape[0],1]),X,1)
+
         #Calculate weights and bias through QR-factorization
-        Q,R = QRFactorization(X)
+        Q,R = QRFactorization(Xextended)
         #weights based on the closed form solution for OLS
-        print(Q,"Q Matrix \n",R ,"R Matrix")
-        self.coef = sp.solve_triangular(R,np.dot(Q.T,y))
-        self.intercept = y.mean() - np.dot(self.coef,X.mean(0))
+        params = sp.solve_triangular(R,np.dot(Q.T,y))
+        self.coef = params[1:]
+        self.intercept = params[0]
 
     def predict(self, X):
         return np.dot(X, self.coef) + self.intercept
