@@ -1,6 +1,7 @@
 import numpy as np
 import scipy.linalg as sp
 
+
 #QR decomposition using modified Gram-Schmidt, for less numerical instability than classical GS
 def QRFactorization(X):
     m,n = X.shape
@@ -18,7 +19,10 @@ def QRFactorization(X):
 
 #Proximatorfunction for the Lasso problem
 def soft_threshholding_operator(omega, theta):
-    return np.sign(omega)* np.maximum(np.abs(omega)- theta, 0)
+    return np.sign(omega)*np.maximum(np.abs(omega)-theta,0)
+
+#vectorize function for elementwise usage
+vsoft_threshholding_operator = np.vectorize(soft_threshholding_operator)
 
 class LinRegression:
     def __init__(self):
@@ -67,22 +71,34 @@ class Ridge:
         return np.dot(X, self.coef) + self.intercept
     
 class Lasso:
-    def __init__(self, maxiter = 3000,  l = 1):
+    def __init__(self, maxiter = 1000, l = 0.001 , learningrate = None):
         self.maxiter = maxiter
         self.l = l
+        self.learningrate = learningrate
 
+    #fit methods uses iterative shrinkage-threshholding algorithm (ISTA) -- special case of proximal gradient descent for lasso
+    #State of the art is coordinate descent algorithm to solve the lasso problem ( implemented later )
     def fit(self, X, y):
-        Xextended = np.append(np.ones([X.shape[0],1]),X,1)
-        self.intercept = None
-        coef = np.zeros(Xextended.shape[1])
-        L = np.linalg.norm(Xextended) ** 2
+        X_extended = np.column_stack([np.ones(X.shape[0]), X])
+        coef = np.zeros(X_extended.shape[1])
 
-        for _ in range(self.maxiter):
-            coef = soft_threshholding_operator(coef - np.dot(Xextended.T, np.dot(Xextended,coef) - y) / L, self.l/L)
-        self.intercept = coef[0]    
+        #if we didnt specify a learningrate we use the largest eigenvalue of X.T*X as the standard
+        if not self.learningrate:
+            eig = np.linalg.eigvalsh(np.dot(X_extended.T,X_extended)/len(y))
+            self.learningrate = 1/np.max(eig)      
+
+        for i in range(self.maxiter):
+            y_pred = np.dot(X_extended, coef)
+            grad = np.dot(X_extended.T, (y_pred - y)) / len(y)
+
+            #Intercept update
+            coef[0] -= self.learningrate * grad[0] 
+
+            #Update feature coefficients with soft-thresholding (regularization)
+            coef[1:] = vsoft_threshholding_operator(coef[1:] - self.learningrate * grad[1:], self.l * self.learningrate)
+
+        self.intercept = coef[0]
         self.coef = coef[1:]
-
+        
     def predict(self, X):
         return np.dot(X, self.coef) + self.intercept
-
-        

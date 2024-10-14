@@ -13,8 +13,8 @@ import matplotlib.pyplot as plt
 
 #generate simple dataset for regression ( 1 feature only )
 X, y = datasets.make_regression(n_samples = 100, n_features = 1, noise = 20, random_state = 1)
-y = np.add(y,1000)
-X = np.add(X,500)
+y = np.subtract(y,1000)
+X = np.subtract(X,10)
 X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=0)
 
 #LinearRegression
@@ -29,7 +29,7 @@ pred_rig = rig.predict(X)
 print(rig.coef, rig.intercept)
 
 #LassoRegression
-lasso = Lasso(l = 1)
+lasso = Lasso()
 lasso.fit(X_train, y_train)
 pred_lasso = lasso.predict(X)
 print(lasso.coef, lasso.intercept)
