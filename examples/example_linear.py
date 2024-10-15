@@ -26,13 +26,11 @@ pred_lin = reg.predict(X)
 rig = Ridge(2)
 rig.fit(X_train,y_train)
 pred_rig = rig.predict(X)
-print(rig.coef, rig.intercept)
 
 #LassoRegression
 lasso = Lasso()
 lasso.fit(X_train, y_train)
 pred_lasso = lasso.predict(X)
-print(lasso.coef, lasso.intercept)
 
 #KNN-Regression
 knn = KNNRegressor(3)

@@ -79,6 +79,7 @@ class Lasso:
     #fit methods uses iterative shrinkage-threshholding algorithm (FISTA) -- special case of proximal gradient descent for lasso
     #State of the art is coordinate descent algorithm to solve the lasso problem ( implemented later )
     def fit(self, X, y):
+        #extend X so we can calculate intercept during loop
         X_extended = np.column_stack([np.ones(X.shape[0]), X])
         coef = np.zeros(X_extended.shape[1])
 
@@ -98,8 +99,7 @@ class Lasso:
             #intercept update
             coef[0] -= self.learningrate * grad[0] 
             #update feature coefficients with soft-thresholding (regularization)
-            coef[1:] = vsoft_threshholding_operator(coef[1:] - self.learningrate * grad[1:], self.l * self.learningrate)
-            
+            coef[1:] = vsoft_threshholding_operator(coef[1:] - self.learningrate * grad[1:], self.l * self.learningrate)               
 
             #following steps till end of loop are the modifications for accelerated ISTA
             theta_prev = theta
