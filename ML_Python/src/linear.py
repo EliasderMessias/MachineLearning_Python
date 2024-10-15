@@ -71,32 +71,45 @@ class Ridge:
         return np.dot(X, self.coef) + self.intercept
     
 class Lasso:
-    def __init__(self, maxiter = 1000, l = 0.001 , learningrate = None):
+    def __init__(self, maxiter = 3000, l = 0.001 , learningrate = None):
         self.maxiter = maxiter
         self.l = l
         self.learningrate = learningrate
 
-    #fit methods uses iterative shrinkage-threshholding algorithm (ISTA) -- special case of proximal gradient descent for lasso
+    #fit methods uses iterative shrinkage-threshholding algorithm (FISTA) -- special case of proximal gradient descent for lasso
     #State of the art is coordinate descent algorithm to solve the lasso problem ( implemented later )
     def fit(self, X, y):
         X_extended = np.column_stack([np.ones(X.shape[0]), X])
         coef = np.zeros(X_extended.shape[1])
 
-        #if we didnt specify a learningrate we use the largest eigenvalue of X.T*X as the standard
+        #if we didnt specify a learningrate we use the largest eigenvalue of X.T*X/len(X) as the standard
         if not self.learningrate:
             eig = np.linalg.eigvalsh(np.dot(X_extended.T,X_extended)/len(y))
             self.learningrate = 1/np.max(eig)      
 
-        for i in range(self.maxiter):
+        #set initial params for FISTA
+        theta = 1
+        coef_prev = coef
+
+        for _ in range(self.maxiter):
             y_pred = np.dot(X_extended, coef)
             grad = np.dot(X_extended.T, (y_pred - y)) / len(y)
 
-            #Intercept update
+            #intercept update
             coef[0] -= self.learningrate * grad[0] 
-
-            #Update feature coefficients with soft-thresholding (regularization)
+            #update feature coefficients with soft-thresholding (regularization)
             coef[1:] = vsoft_threshholding_operator(coef[1:] - self.learningrate * grad[1:], self.l * self.learningrate)
+            
 
+            #following steps till end of loop are the modifications for accelerated ISTA
+            theta_prev = theta
+            theta = (1 + np.sqrt(1 + 4* theta ** 2))/2
+       
+            diff = coef - coef_prev
+            coef_prev = coef
+            
+            coef = coef + (theta_prev - 1)/theta * diff
+            
         self.intercept = coef[0]
         self.coef = coef[1:]
         
