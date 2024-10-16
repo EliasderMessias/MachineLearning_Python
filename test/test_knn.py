@@ -1,16 +1,12 @@
-from pathlib import Path
-import sys
-path_root = Path(__file__).parents[1]
-sys.path.append(str(path_root))
-
-import unittest
 import numpy as np
+import unittest
+
 from src.knn import KNNClassifier, KNNRegressor
 from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split
 
 
-class TestKNN(unittest.TestCase):
+class TestKNN(unittest.TestCase):       
     def test_internalNeighbourParam(self):
         self.assertEqual(KNNClassifier(3).k, 3)
         self.assertEqual(KNNClassifier(1).k, 1)

@@ -1,9 +1,5 @@
-from pathlib import Path
-import sys
-path_root = Path(__file__).parents[1]
-sys.path.append(str(path_root))
-
 import unittest
+
 from src.linear import LinRegression
 from sklearn import datasets
 from sklearn.model_selection import train_test_split
