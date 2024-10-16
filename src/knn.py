@@ -1,8 +1,7 @@
 import numpy as np
 from statistics import mode
+from utils.utilfunctions import euclid_dist
 
-def euclid_dist(x,y):
-    return np.sqrt(np.sum((x-y)**2))
 
 class _KNN:   #class that mirrors functionality of scikitlearns ML methods for k-Nearest-Neighbours
     def __init__(self, k = 3):
