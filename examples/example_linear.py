@@ -6,26 +6,28 @@ from sklearn import datasets
 from sklearn.model_selection import train_test_split
 import matplotlib.pyplot as plt
 
-#generate simple dataset for regression ( 1 feature only )
+#generate simple dataset for regression 
 X, y = datasets.make_regression(n_samples = 100, n_features = 1, noise = 20, random_state = 1)
-y = np.subtract(y,1000)
-X = np.subtract(X,10)
+
 X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=0)
 
 #LinearRegression
 reg = LinRegression()
 reg.fit(X_train, y_train)
 pred_lin = reg.predict(X)
+print(reg.intercept)
 
 #RidgeRegression
 rig = Ridge(2)
-rig.fit(X_train,y_train)
+rig.fit(X_train, y_train)
 pred_rig = rig.predict(X)
+print(rig.intercept)
 
 #LassoRegression
 lasso = Lasso()
 lasso.fit(X_train, y_train)
 pred_lasso = lasso.predict(X)
+print(lasso.intercept)
 
 #KNN-Regression
 knn = KNNRegressor(3)
@@ -37,7 +39,7 @@ pred_knn = knn.predict(X_sorted)
 
 #plotting the sample + predicted Lines
 cmap = plt.get_cmap('viridis')
-fit = plt.figure(figsize = (8,6))
+fit = plt.figure(figsize = (8, 6))
 m1 = plt.scatter(X_train, y_train, color = cmap(0.9), s = 10)
 m2 = plt.scatter(X_test, y_test, color = cmap(0.5), s = 10)
 plt.plot(X, pred_lin, color = 'black', linewidth = 1, label = 'Lin_Regression')
